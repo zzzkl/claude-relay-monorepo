@@ -5,9 +5,14 @@
 
 import { Hono } from 'hono'
 import { ClaudeProxyService } from '../../services/proxy/claude-proxy'
+import { optionalClientAuth, getClientId } from '../../middleware/client-auth'
+import { ClientApiKeyService } from '../../services/admin/client-keys'
 import type { Bindings } from '../../types/env'
 
 const claudeRoutes = new Hono<{ Bindings: Bindings }>()
+
+// 应用客户端认证中间件（可选的，如果提供了就验证）
+claudeRoutes.use('/messages', optionalClientAuth())
 
 /**
  * Claude Messages API 代理
@@ -15,6 +20,16 @@ const claudeRoutes = new Hono<{ Bindings: Bindings }>()
  */
 claudeRoutes.post('/messages', async (c) => {
   const claudeService = new ClaudeProxyService(c.env.CLAUDE_RELAY_ADMIN_KV)
+  
+  // 如果有客户端认证，记录使用情况
+  const clientId = getClientId(c)
+  if (clientId && c.env.CLAUDE_RELAY_ADMIN_KV) {
+    // 异步记录使用，不阻塞请求
+    const clientKeyService = new ClientApiKeyService(c.env.CLAUDE_RELAY_ADMIN_KV)
+    clientKeyService.recordUsage(clientId).catch(error => {
+      console.error('Failed to record client key usage:', error)
+    })
+  }
   
   // 直接返回代理服务的响应，异常由全局错误处理中间件捕获
   return await claudeService.proxyRequest(c.req.raw)

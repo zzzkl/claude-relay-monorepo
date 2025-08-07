@@ -88,6 +88,16 @@
                 <span>路由配置</span>
               </div>
             </button>
+            <button @click="activeTab = 'client-keys'"
+                    :class="activeTab === 'client-keys' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+              <div class="flex items-center justify-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                <span>客户端 Key</span>
+              </div>
+            </button>
           </nav>
         </div>
 
@@ -108,6 +118,9 @@
           <RouteConfigManager 
             v-if="activeTab === 'routes'"
             :available-providers="providers" />
+          
+          <!-- 客户端 API Key 管理 -->
+          <ClientKeyManager v-if="activeTab === 'client-keys'" />
         </div>
       </div>
     </div>
@@ -127,6 +140,7 @@ import ClaudeAccountManager from '../../components/admin/ClaudeAccountManager.vu
 import ProviderManager from '../../components/admin/ProviderManager.vue'
 import ModelSelector from '../../components/admin/ModelSelector.vue'
 import RouteConfigManager from '../../components/admin/RouteConfigManager.vue'
+import ClientKeyManager from '../../components/admin/ClientKeyManager.vue'
 
 // 页面元信息
 useHead({

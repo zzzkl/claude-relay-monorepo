@@ -10,6 +10,7 @@ import { modelRoutes } from './models'
 import { claudeAccountRoutes } from './claude-accounts'
 import { keyPoolRoutes } from './key-pool'
 import { routeConfigRoutes } from './route-configs'
+import { clientKeysRoutes } from './client-keys'
 import type { Bindings } from '../../types/env'
 
 const adminRoutes = new Hono<{ Bindings: Bindings }>()
@@ -22,5 +23,6 @@ adminRoutes.route('/', modelRoutes)
 adminRoutes.route('/', claudeAccountRoutes)
 adminRoutes.route('/', keyPoolRoutes)
 adminRoutes.route('/', routeConfigRoutes)
+adminRoutes.route('/client-keys', clientKeysRoutes)
 
 export { adminRoutes }
