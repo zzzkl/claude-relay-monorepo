@@ -25,7 +25,8 @@ export default defineNuxtConfig({
           manualChunks: {
             // 更细粒度的vendor分割
             'vue-vendor': ['vue', 'vue-router'],
-            'pinia': ['pinia']
+            'pinia': ['pinia'],
+            'echarts': ['echarts', 'vue-echarts']
           }
         }
       },
@@ -42,7 +43,11 @@ export default defineNuxtConfig({
     },
     // 优化依赖预构建
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'pinia']
+      include: ['vue', 'vue-router', 'pinia', 'echarts', 'vue-echarts']
+    },
+    // SSR 配置
+    ssr: {
+      noExternal: ['vue-echarts', 'echarts']
     }
   },
   

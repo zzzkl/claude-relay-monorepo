@@ -21,18 +21,13 @@ claudeRoutes.use('/messages', optionalClientAuth())
 claudeRoutes.post('/messages', async (c) => {
   const claudeService = new ClaudeProxyService(c.env.CLAUDE_RELAY_ADMIN_KV)
   
-  // 如果有客户端认证，记录使用情况
+  // 获取客户端 ID
   const clientId = getClientId(c)
-  if (clientId && c.env.CLAUDE_RELAY_ADMIN_KV) {
-    // 异步记录使用，不阻塞请求
-    const clientKeyService = new ClientApiKeyService(c.env.CLAUDE_RELAY_ADMIN_KV)
-    clientKeyService.recordUsage(clientId).catch(error => {
-      console.error('Failed to record client key usage:', error)
-    })
-  }
   
-  // 直接返回代理服务的响应，异常由全局错误处理中间件捕获
-  return await claudeService.proxyRequest(c.req.raw)
+  // 代理请求，传递 clientId 以便记录 token 使用
+  const response = await claudeService.proxyRequest(c.req.raw, clientId)
+  
+  return response
 })
 
 /**

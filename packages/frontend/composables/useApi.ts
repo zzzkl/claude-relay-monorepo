@@ -9,7 +9,20 @@ export const useApi = () => {
   
   // 封装 fetch 请求，自动添加基础 URL
   const apiFetch = async (url: string, options?: any) => {
-    const fullUrl = `${apiBaseUrl}${url}`
+    // 处理 params 参数
+    let finalUrl = url
+    if (options?.params) {
+      const params = new URLSearchParams()
+      Object.entries(options.params).forEach(([key, value]) => {
+        params.append(key, String(value))
+      })
+      finalUrl = `${url}?${params.toString()}`
+      // 删除 options 中的 params，因为已经处理过了
+      const { params: _, ...restOptions } = options
+      options = restOptions
+    }
+    
+    const fullUrl = `${apiBaseUrl}${finalUrl}`
     
     try {
       const response = await fetch(fullUrl, {

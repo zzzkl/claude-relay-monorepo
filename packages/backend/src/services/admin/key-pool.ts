@@ -24,7 +24,7 @@ export class KeyPoolService {
     
     // 获取供应商信息
     const provider = await this.getProvider(providerId)
-    console.log(`[KeyPoolService] Provider found:`, provider ? provider.name : 'NOT FOUND')
+    console.log('[KeyPoolService] Provider found:', provider ? provider.name : 'NOT FOUND')
     
     if (!provider) {
       console.error(`[KeyPoolService] Provider ${providerId} not found`)
@@ -36,7 +36,7 @@ export class KeyPoolService {
     const pool = await this.keyPoolManager.getOrCreatePool(providerId, provider.type)
     
     // 获取所有密钥和统计信息
-    console.log(`[KeyPoolService] Loading keys and stats...`)
+    console.log('[KeyPoolService] Loading keys and stats...')
     const keys = await pool.getKeys()
     const stats = await pool.getStats()
     
@@ -123,15 +123,15 @@ export class KeyPoolService {
 
     for (const keyId of keyIds) {
       switch (operation) {
-        case 'enable':
-          await pool.updateKeyStatus(keyId, 'active')
-          break
-        case 'disable':
-          await pool.updateKeyStatus(keyId, 'disabled')
-          break
-        case 'delete':
-          await pool.removeKey(keyId)
-          break
+      case 'enable':
+        await pool.updateKeyStatus(keyId, 'active')
+        break
+      case 'disable':
+        await pool.updateKeyStatus(keyId, 'disabled')
+        break
+      case 'delete':
+        await pool.removeKey(keyId)
+        break
       }
     }
   }
@@ -178,7 +178,7 @@ export class KeyPoolService {
     const providersData = await this.kv.get(ADMIN_STORAGE_KEYS.MODEL_PROVIDERS)
     
     if (!providersData) {
-      console.log(`[KeyPoolService.getProvider] No providers found in KV`)
+      console.log('[KeyPoolService.getProvider] No providers found in KV')
       return null
     }
     
@@ -188,14 +188,14 @@ export class KeyPoolService {
       const parsed = typeof providersData === 'string' ? JSON.parse(providersData) : providersData
       providers = Array.isArray(parsed) ? parsed : []
     } catch (error) {
-      console.error(`[KeyPoolService.getProvider] Failed to parse providers data:`, error)
+      console.error('[KeyPoolService.getProvider] Failed to parse providers data:', error)
       return null
     }
     
     console.log(`[KeyPoolService.getProvider] Found ${providers.length} providers in KV`)
     
     if (providers.length > 0) {
-      console.log(`[KeyPoolService.getProvider] Available provider IDs:`, providers.map(p => p.id))
+      console.log('[KeyPoolService.getProvider] Available provider IDs:', providers.map(p => p.id))
     }
     
     const provider = providers.find(p => p.id === providerId)

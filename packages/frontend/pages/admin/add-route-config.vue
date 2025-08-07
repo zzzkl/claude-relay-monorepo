@@ -2,21 +2,21 @@
   <div class="min-h-screen bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50">
     <div class="container mx-auto px-4 py-8 max-w-5xl">
       <div class="mb-6">
-      <div class="flex items-center space-x-3 mb-2">
-        <button @click="() => navigateBack()" class="text-gray-500 hover:text-gray-700">
-          <Icon name="material-symbols:arrow-back" class="w-6 h-6" />
-        </button>
-        <h1 class="text-xl font-semibold text-gray-900">添加路由配置</h1>
+        <div class="flex items-center space-x-3 mb-2">
+          <button @click="() => navigateBack()" class="text-gray-500 hover:text-gray-700">
+            <Icon name="material-symbols:arrow-back" class="w-6 h-6" />
+          </button>
+          <h1 class="text-xl font-semibold text-gray-900">添加路由配置</h1>
+        </div>
+        <p class="text-sm text-gray-500 ml-9">配置不同场景下的模型路由策略</p>
       </div>
-      <p class="text-sm text-gray-500 ml-9">配置不同场景下的模型路由策略</p>
-    </div>
 
-    <RouteConfigForm
-      :loading="loading"
-      :available-providers="providers"
-      @submit="handleSubmit"
-      @cancel="navigateBack"
-    />
+      <RouteConfigForm
+        :loading="loading"
+        :available-providers="providers"
+        @submit="handleSubmit"
+        @cancel="navigateBack"
+      />
     </div>
   </div>
 </template>

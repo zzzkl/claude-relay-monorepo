@@ -47,8 +47,8 @@ export class ClientApiKeyAuthService {
         }
       }
 
-      // 认证成功，更新使用统计
-      await this.recordKeyUsage(clientKey.id)
+      // 认证成功，更新最后使用时间（不增加使用次数，使用次数在请求处理完成后才增加）
+      await this.recordLastUsedTime(clientKey.id)
 
       return {
         success: true,
@@ -83,16 +83,13 @@ export class ClientApiKeyAuthService {
     return null
   }
 
-  // 记录 Key 使用情况
-  private async recordKeyUsage(keyId: string): Promise<void> {
+  // 更新最后使用时间（认证时调用，只更新时间不增加次数）
+  private async recordLastUsedTime(keyId: string): Promise<void> {
     try {
-      await Promise.all([
-        this.repository.updateUsage(keyId),
-        this.repository.updateUsageStats(keyId)
-      ])
+      await this.repository.updateLastUsedTime(keyId)
     } catch (error) {
-      // 记录使用统计失败不应该影响认证结果，只记录错误
-      console.error('Failed to record key usage:', error)
+      // 更新失败不应该影响认证结果，只记录错误
+      console.error('Failed to update last used time:', error)
     }
   }
 

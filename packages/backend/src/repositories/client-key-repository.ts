@@ -83,7 +83,12 @@ export class ClientApiKeyRepository {
       dailyUsage: {},
       hourlyUsage: {},
       totalRequests: 0,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      // Token 统计字段
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      dailyTokenUsage: {},
+      monthlyTokenUsage: {}
     }
     await this.saveUsageStats(initialStats)
   }
@@ -133,7 +138,23 @@ export class ClientApiKeyRepository {
     return true
   }
 
-  // 更新最后使用时间和使用次数
+  // 更新最后使用时间（仅更新时间，不增加使用次数）
+  async updateLastUsedTime(keyId: string): Promise<void> {
+    const key = await this.getById(keyId)
+    if (!key) {
+      return
+    }
+
+    const now = Date.now()
+    const updatedKey: ClientApiKey = {
+      ...key,
+      lastUsedAt: now
+    }
+
+    await this.adminKv.put(getClientKeyStorageKey(keyId), JSON.stringify(updatedKey))
+  }
+
+  // 更新最后使用时间和使用次数（请求处理完成后调用）
   async updateUsage(keyId: string): Promise<void> {
     const key = await this.getById(keyId)
     if (!key) {
@@ -162,7 +183,10 @@ export class ClientApiKeyRepository {
   }
 
   // 更新使用统计
-  async updateUsageStats(keyId: string): Promise<void> {
+  async updateUsageStats(
+    keyId: string,
+    tokenUsage?: { inputTokens: number; outputTokens: number }
+  ): Promise<void> {
     const stats = await this.getUsageStats(keyId)
     if (!stats) {
       return
@@ -170,6 +194,7 @@ export class ClientApiKeyRepository {
 
     const now = new Date()
     const dateKey = now.toISOString().split('T')[0] // YYYY-MM-DD
+    const monthKey = now.toISOString().substring(0, 7) // YYYY-MM
     const hourKey = now.getHours().toString().padStart(2, '0') // HH
 
     // 更新每日统计
@@ -188,8 +213,63 @@ export class ClientApiKeyRepository {
       }
     })
 
-    // 更新总计数和时间戳
+    // 更新总计数
     stats.totalRequests += 1
+
+    // 如果有 token 使用信息，更新 token 统计
+    if (tokenUsage) {
+      // 更新总 token 数
+      stats.totalInputTokens = (stats.totalInputTokens || 0) + tokenUsage.inputTokens
+      stats.totalOutputTokens = (stats.totalOutputTokens || 0) + tokenUsage.outputTokens
+
+      // 初始化 token 使用记录
+      if (!stats.dailyTokenUsage) {
+        stats.dailyTokenUsage = {}
+      }
+      if (!stats.monthlyTokenUsage) {
+        stats.monthlyTokenUsage = {}
+      }
+
+      // 更新每日 token 使用
+      if (!stats.dailyTokenUsage[dateKey]) {
+        stats.dailyTokenUsage[dateKey] = {
+          requests: 0,
+          inputTokens: 0,
+          outputTokens: 0
+        }
+      }
+      stats.dailyTokenUsage[dateKey].requests += 1
+      stats.dailyTokenUsage[dateKey].inputTokens += tokenUsage.inputTokens
+      stats.dailyTokenUsage[dateKey].outputTokens += tokenUsage.outputTokens
+
+      // 更新每月 token 使用
+      if (!stats.monthlyTokenUsage[monthKey]) {
+        stats.monthlyTokenUsage[monthKey] = {
+          requests: 0,
+          inputTokens: 0,
+          outputTokens: 0
+        }
+      }
+      stats.monthlyTokenUsage[monthKey].requests += 1
+      stats.monthlyTokenUsage[monthKey].inputTokens += tokenUsage.inputTokens
+      stats.monthlyTokenUsage[monthKey].outputTokens += tokenUsage.outputTokens
+
+      // 清理旧的每日数据（只保留最近 90 天）
+      const dailyDates = Object.keys(stats.dailyTokenUsage).sort()
+      if (dailyDates.length > 90) {
+        const datesToRemove = dailyDates.slice(0, dailyDates.length - 90)
+        datesToRemove.forEach(date => delete stats.dailyTokenUsage![date])
+      }
+
+      // 清理旧的每月数据（只保留最近 12 个月）
+      const monthlyDates = Object.keys(stats.monthlyTokenUsage).sort()
+      if (monthlyDates.length > 12) {
+        const monthsToRemove = monthlyDates.slice(0, monthlyDates.length - 12)
+        monthsToRemove.forEach(month => delete stats.monthlyTokenUsage![month])
+      }
+    }
+
+    // 更新时间戳
     stats.lastUpdated = Date.now()
 
     await this.saveUsageStats(stats)

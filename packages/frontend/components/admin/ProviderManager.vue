@@ -6,8 +6,9 @@
           <h3 class="text-xl font-bold text-gray-900">模型供应商管理</h3>
           <p class="text-sm text-gray-600 mt-1">管理接入的第三方模型供应商，如魔搭、智谱 AI 等</p>
         </div>
-        <NuxtLink to="/admin/add-provider" 
-                 class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
+        <NuxtLink
+          to="/admin/add-provider" 
+          class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
@@ -16,8 +17,9 @@
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div v-for="provider in providers" :key="provider.id" 
-             class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
+        <div
+          v-for="provider in providers" :key="provider.id" 
+          class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
@@ -34,8 +36,9 @@
                 </p>
               </div>
             </div>
-            <span :class="provider.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'"
-                  class="px-3 py-1 text-xs font-medium rounded-full">
+            <span
+              :class="provider.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'"
+              class="px-3 py-1 text-xs font-medium rounded-full">
               {{ provider.status === 'active' ? '• 活跃' : '• 停用' }}
             </span>
           </div>
@@ -60,27 +63,31 @@
               
               <!-- 模型列表显示 -->
               <div class="ml-6">
-                <div v-if="!provider.models?.length" 
-                     class="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-md italic">
+                <div
+                  v-if="!provider.models?.length" 
+                  class="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-md italic">
                   未配置模型
                 </div>
                 <div v-else class="space-y-2">
                   <!-- 默认显示前3个模型 -->
                   <div class="flex flex-wrap gap-1">
-                    <span v-for="model in (expandedProviders.has(provider.id) ? provider.models : provider.models.slice(0, 3))" 
-                          :key="model"
-                          class="inline-block px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-md font-mono hover:bg-blue-100 transition-colors">
+                    <span
+                      v-for="model in (expandedProviders.has(provider.id) ? provider.models : provider.models.slice(0, 3))" 
+                      :key="model"
+                      class="inline-block px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-md font-mono hover:bg-blue-100 transition-colors">
                       {{ model }}
                     </span>
                   </div>
                   <!-- 展开/收起按钮 -->
-                  <button v-if="provider.models.length > 3"
-                          @click="toggleProviderExpansion(provider.id)"
-                          class="text-xs text-orange-500 hover:text-orange-600 flex items-center space-x-1 transition-colors">
+                  <button
+                    v-if="provider.models.length > 3"
+                    @click="toggleProviderExpansion(provider.id)"
+                    class="text-xs text-orange-500 hover:text-orange-600 flex items-center space-x-1 transition-colors">
                     <span>{{ expandedProviders.has(provider.id) ? '收起' : `查看全部 ${provider.models.length} 个模型` }}</span>
-                    <svg class="w-3 h-3 transition-transform" 
-                         :class="expandedProviders.has(provider.id) ? 'rotate-180' : ''"
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-3 h-3 transition-transform" 
+                      :class="expandedProviders.has(provider.id) ? 'rotate-180' : ''"
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                   </button>
@@ -105,19 +112,22 @@
           </div>
           
           <div class="flex space-x-2">
-            <NuxtLink :to="`/admin/key-pool/${provider.id}`" 
-                    class="px-4 py-2 text-emerald-600 hover:text-emerald-700 rounded-xl border border-emerald-200 hover:border-emerald-300 transition duration-200 text-sm inline-flex items-center">
+            <NuxtLink
+              :to="`/admin/key-pool/${provider.id}`" 
+              class="px-4 py-2 text-emerald-600 hover:text-emerald-700 rounded-xl border border-emerald-200 hover:border-emerald-300 transition duration-200 text-sm inline-flex items-center">
               <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
               </svg>
               密钥池
             </NuxtLink>
-            <button @click="editProvider(provider)" 
-                    class="px-4 py-2 text-orange-600 hover:text-orange-700 rounded-xl border border-orange-200 hover:border-orange-300 transition duration-200 text-sm">
+            <button
+              @click="editProvider(provider)" 
+              class="px-4 py-2 text-orange-600 hover:text-orange-700 rounded-xl border border-orange-200 hover:border-orange-300 transition duration-200 text-sm">
               编辑
             </button>
-            <button @click="deleteProvider(provider.id)" 
-                    class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
+            <button
+              @click="deleteProvider(provider.id)" 
+              class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
               删除
             </button>
           </div>

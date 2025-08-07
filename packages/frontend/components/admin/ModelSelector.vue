@@ -8,9 +8,10 @@
       
       <div class="space-y-4">
         <!-- Claude 官方模型选项 -->
-        <div @click="selectOption('claude', null)"
-             :class="isSelected('claude', null) ? 'border-orange-400 bg-orange-50/50' : 'border-orange-200'"
-             class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border-2 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition duration-300 group">
+        <div
+          @click="selectOption('claude', null)"
+          :class="isSelected('claude', null) ? 'border-orange-400 bg-orange-50/50' : 'border-orange-200'"
+          class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border-2 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition duration-300 group">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center">
@@ -28,8 +29,9 @@
               <span class="px-3 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">
                 • 可用
               </span>
-              <div v-if="isSelected('claude', null)" 
-                   class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+              <div
+                v-if="isSelected('claude', null)" 
+                class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
@@ -40,11 +42,12 @@
         </div>
 
         <!-- 路由配置选项（平铺展开） -->
-        <div v-for="config in availableRouteConfigs" 
-             :key="config.id"
-             @click="selectOption('route', config.id)"
-             :class="isSelected('route', config.id) ? 'border-blue-400 bg-blue-50/50' : 'border-blue-200'"
-             class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border-2 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition duration-300 group">
+        <div
+          v-for="config in availableRouteConfigs" 
+          :key="config.id"
+          @click="selectOption('route', config.id)"
+          :class="isSelected('route', config.id) ? 'border-blue-400 bg-blue-50/50' : 'border-blue-200'"
+          class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border-2 rounded-2xl p-6 cursor-pointer hover:shadow-lg transition duration-300 group">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
@@ -85,8 +88,9 @@
               <span class="px-3 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">
                 • 可用
               </span>
-              <div v-if="isSelected('route', config.id)" 
-                   class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+              <div
+                v-if="isSelected('route', config.id)" 
+                class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
@@ -108,8 +112,9 @@
               <p class="text-gray-500 text-lg font-medium">暂无路由配置</p>
               <p class="text-gray-400 text-sm mt-1">创建路由配置以启用智能模型选择功能</p>
             </div>
-            <button @click="$emit('navigate-to-routes')" 
-                    class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg">
+            <button
+              @click="$emit('navigate-to-routes')" 
+              class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg">
               创建路由配置
             </button>
           </div>

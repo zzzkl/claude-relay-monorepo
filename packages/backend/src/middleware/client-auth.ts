@@ -69,18 +69,18 @@ export const clientAuthMiddleware = (options: ClientAuthMiddlewareOptions = {}) 
       let message = 'Authentication failed'
 
       switch (authResult.error) {
-        case CLIENT_KEY_ERRORS.KEY_NOT_FOUND:
-        case CLIENT_KEY_ERRORS.KEY_INVALID:
-          statusCode = 401
-          message = 'Invalid API key'
-          break
-        case CLIENT_KEY_ERRORS.KEY_DISABLED:
-          statusCode = 403
-          message = 'API key has been disabled'
-          break
-        default:
-          statusCode = 401
-          message = 'Authentication failed'
+      case CLIENT_KEY_ERRORS.KEY_NOT_FOUND:
+      case CLIENT_KEY_ERRORS.KEY_INVALID:
+        statusCode = 401
+        message = 'Invalid API key'
+        break
+      case CLIENT_KEY_ERRORS.KEY_DISABLED:
+        statusCode = 403
+        message = 'API key has been disabled'
+        break
+      default:
+        statusCode = 401
+        message = 'Authentication failed'
       }
 
       throw new HTTPException(statusCode as 401 | 403, { message })

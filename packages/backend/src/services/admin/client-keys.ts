@@ -8,7 +8,11 @@ import {
   ClientApiKeyStatus,
   ClientApiKeyListItem,
   CreateClientKeyRequest,
-  UpdateClientKeyRequest 
+  UpdateClientKeyRequest,
+  ClientKeyRankingItem,
+  ClientKeysOverallStats,
+  UsageRankingParams,
+  TokenHistoryItem
 } from '../../../../../shared/types/admin/client-keys'
 import { 
   CLIENT_KEY_ERRORS, 
@@ -119,10 +123,13 @@ export class ClientApiKeyService {
   }
 
   // 记录 API Key 使用（由认证服务调用）
-  async recordUsage(keyId: string): Promise<void> {
+  async recordUsage(
+    keyId: string,
+    tokenUsage?: { inputTokens: number; outputTokens: number }
+  ): Promise<void> {
     await Promise.all([
       this.repository.updateUsage(keyId),
-      this.repository.updateUsageStats(keyId)
+      this.repository.updateUsageStats(keyId, tokenUsage)
     ])
   }
 
@@ -167,5 +174,191 @@ export class ClientApiKeyService {
   private isValidKeyFormat(keyString: string): boolean {
     return keyString.startsWith(CLIENT_KEY_CONFIG.KEY_PREFIX) && 
            keyString.length >= CLIENT_KEY_CONFIG.KEY_PREFIX.length + CLIENT_KEY_CONFIG.KEY_LENGTH
+  }
+
+  // 获取总体统计信息
+  async getOverallStats(): Promise<ClientKeysOverallStats> {
+    const keys = await this.repository.getAll()
+    const today = new Date().toISOString().split('T')[0]
+    
+    const totalKeys = keys.length
+    let activeKeys = 0
+    let todayRequests = 0
+    let todayInputTokens = 0
+    let todayOutputTokens = 0
+    
+    // 计算最近7天的趋势
+    const weeklyTrend: ClientKeysOverallStats['weeklyTrend'] = []
+    const dates: string[] = []
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      dates.push(date.toISOString().split('T')[0])
+      weeklyTrend.push({
+        date: date.toISOString().split('T')[0],
+        requests: 0,
+        inputTokens: 0,
+        outputTokens: 0
+      })
+    }
+    
+    // 遍历所有 Key 的统计信息
+    for (const key of keys) {
+      const stats = await this.repository.getUsageStats(key.id)
+      if (!stats) continue
+      
+      // 检查今日是否有使用
+      if (stats.dailyUsage && stats.dailyUsage[today]) {
+        activeKeys++
+        todayRequests += stats.dailyUsage[today]
+      }
+      
+      // 统计今日 token 使用
+      if (stats.dailyTokenUsage && stats.dailyTokenUsage[today]) {
+        todayInputTokens += stats.dailyTokenUsage[today].inputTokens
+        todayOutputTokens += stats.dailyTokenUsage[today].outputTokens
+      }
+      
+      // 统计周趋势
+      dates.forEach((date, index) => {
+        if (stats.dailyTokenUsage && stats.dailyTokenUsage[date]) {
+          weeklyTrend[index].requests += stats.dailyTokenUsage[date].requests
+          weeklyTrend[index].inputTokens += stats.dailyTokenUsage[date].inputTokens
+          weeklyTrend[index].outputTokens += stats.dailyTokenUsage[date].outputTokens
+        }
+      })
+    }
+    
+    return {
+      totalKeys,
+      activeKeys,
+      todayRequests,
+      todayInputTokens,
+      todayOutputTokens,
+      weeklyTrend
+    }
+  }
+
+  // 获取用量排行
+  async getUsageRanking(params: UsageRankingParams): Promise<ClientKeyRankingItem[]> {
+    const keys = await this.repository.getAll()
+    const ranking: ClientKeyRankingItem[] = []
+    const { metric, period, limit = 10 } = params
+    
+    // 计算时间范围
+    const now = new Date()
+    let startDate: string | null = null
+    
+    if (period === 'today') {
+      startDate = now.toISOString().split('T')[0]
+    } else if (period === 'week') {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      startDate = weekAgo.toISOString().split('T')[0]
+    } else if (period === 'month') {
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      startDate = monthAgo.toISOString().split('T')[0]
+    }
+    
+    // 计算每个 Key 的指标值
+    for (const key of keys) {
+      const stats = await this.repository.getUsageStats(key.id)
+      if (!stats) continue
+      
+      let value = 0
+      let requests = 0
+      let inputTokens = 0
+      let outputTokens = 0
+      
+      if (period === 'all') {
+        // 使用总计值
+        requests = stats.totalRequests
+        inputTokens = stats.totalInputTokens || 0
+        outputTokens = stats.totalOutputTokens || 0
+      } else {
+        // 根据时间范围累计
+        if (stats.dailyTokenUsage) {
+          for (const [date, usage] of Object.entries(stats.dailyTokenUsage)) {
+            if (startDate && date >= startDate) {
+              requests += usage.requests
+              inputTokens += usage.inputTokens
+              outputTokens += usage.outputTokens
+            }
+          }
+        }
+      }
+      
+      // 根据指标计算排序值
+      switch (metric) {
+      case 'requests':
+        value = requests
+        break
+      case 'input_tokens':
+        value = inputTokens
+        break
+      case 'output_tokens':
+        value = outputTokens
+        break
+      case 'total_tokens':
+        value = inputTokens + outputTokens
+        break
+      }
+      
+      // 只添加有使用的 Key
+      if (value > 0) {
+        ranking.push({
+          keyId: key.id,
+          keyPreview: this.maskKeyForList(key).keyPreview,
+          description: key.description,
+          value,
+          requests,
+          inputTokens,
+          outputTokens,
+          lastUsedAt: key.lastUsedAt,
+          status: key.status
+        })
+      }
+    }
+    
+    // 排序并取前 N 个
+    ranking.sort((a, b) => b.value - a.value)
+    return ranking.slice(0, limit)
+  }
+
+  // 获取单个 Key 的 Token 使用历史
+  async getTokenHistory(keyId: string, period: 'day' | 'week' | 'month'): Promise<TokenHistoryItem[]> {
+    const stats = await this.repository.getUsageStats(keyId)
+    if (!stats) {
+      throw new Error(CLIENT_KEY_ERRORS.KEY_NOT_FOUND)
+    }
+    
+    const history: TokenHistoryItem[] = []
+    const now = new Date()
+    
+    let days = 1
+    if (period === 'week') days = 7
+    if (period === 'month') days = 30
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+      const dateStr = date.toISOString().split('T')[0]
+      
+      if (stats.dailyTokenUsage && stats.dailyTokenUsage[dateStr]) {
+        history.push({
+          date: dateStr,
+          requests: stats.dailyTokenUsage[dateStr].requests,
+          inputTokens: stats.dailyTokenUsage[dateStr].inputTokens,
+          outputTokens: stats.dailyTokenUsage[dateStr].outputTokens
+        })
+      } else {
+        history.push({
+          date: dateStr,
+          requests: 0,
+          inputTokens: 0,
+          outputTokens: 0
+        })
+      }
+    }
+    
+    return history
   }
 }

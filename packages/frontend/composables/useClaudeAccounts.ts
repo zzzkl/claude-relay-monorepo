@@ -190,25 +190,25 @@ export const useClaudeAccounts = () => {
   // 工具方法
   const getAccountStatusClass = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-emerald-100 text-emerald-700'
-      case 'expired':
-        return 'bg-yellow-100 text-yellow-700'
-      case 'inactive':
-      default:
-        return 'bg-red-100 text-red-700'
+    case 'active':
+      return 'bg-emerald-100 text-emerald-700'
+    case 'expired':
+      return 'bg-yellow-100 text-yellow-700'
+    case 'inactive':
+    default:
+      return 'bg-red-100 text-red-700'
     }
   }
 
   const getAccountStatusText = (status: string) => {
     switch (status) {
-      case 'active':
-        return '• 活跃'
-      case 'expired':
-        return '• 已过期'
-      case 'inactive':
-      default:
-        return '• 未授权'
+    case 'active':
+      return '• 活跃'
+    case 'expired':
+      return '• 已过期'
+    case 'inactive':
+    default:
+      return '• 未授权'
     }
   }
 

@@ -4,9 +4,10 @@
     <div v-if="!isEdit && !selectedProviderType">
       <h3 class="text-lg font-medium text-gray-900 mb-4">选择供应商类型</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div v-for="(config, key) in PROVIDER_CONFIGS" :key="key" 
-             @click="selectProviderType(key)"
-             class="bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-orange-300 transition duration-200">
+        <div
+          v-for="(config, key) in PROVIDER_CONFIGS" :key="key" 
+          @click="selectProviderType(key)"
+          class="bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-orange-300 transition duration-200">
           <div class="flex items-center space-x-3">
             <div :class="config.icon" class="w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,11 +30,12 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           供应商名称 <span class="text-red-500">*</span>
         </label>
-        <input type="text" 
-               v-model="form.name"
-               required
-               class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
-               :placeholder="isEdit ? '供应商名称' : `例如：我的${currentProviderConfig?.name}账号`">
+        <input
+          type="text" 
+          v-model="form.name"
+          required
+          class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
+          :placeholder="isEdit ? '供应商名称' : `例如：我的${currentProviderConfig?.name}账号`">
       </div>
 
       <!-- API 端点 -->
@@ -41,13 +43,14 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           API 端点 <span class="text-red-500">*</span>
         </label>
-        <input type="url" 
-               v-model="form.endpoint"
-               required
-               :readonly="isEndpointReadonly"
-               class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
-               :class="{ 'bg-gray-50': isEndpointReadonly }"
-               placeholder="https://api.example.com/v1/chat/completions">
+        <input
+          type="url" 
+          v-model="form.endpoint"
+          required
+          :readonly="isEndpointReadonly"
+          class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
+          :class="{ 'bg-gray-50': isEndpointReadonly }"
+          placeholder="https://api.example.com/v1/chat/completions">
       </div>
 
       <!-- 模型管理 -->
@@ -60,13 +63,14 @@
           <div v-if="availableModels.length > 0" class="bg-gray-50 p-4 rounded-xl">
             <label class="block text-sm font-medium text-gray-600 mb-2">快速添加预设模型</label>
             <div class="flex flex-wrap gap-2">
-              <button v-for="model in availableModels" 
-                      :key="model"
-                      @click="addModel(model)"
-                      type="button"
-                      :disabled="form.models.includes(model)"
-                      class="px-3 py-1 text-xs rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      :class="form.models.includes(model) ? 'bg-orange-100 text-orange-600 border-orange-200' : 'bg-white text-gray-600'">
+              <button
+                v-for="model in availableModels" 
+                :key="model"
+                @click="addModel(model)"
+                type="button"
+                :disabled="form.models.includes(model)"
+                class="px-3 py-1 text-xs rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="form.models.includes(model) ? 'bg-orange-100 text-orange-600 border-orange-200' : 'bg-white text-gray-600'">
                 <span v-if="form.models.includes(model)">✓</span>
                 {{ model }}
               </button>
@@ -82,13 +86,15 @@
               请添加至少一个模型
             </div>
             <div v-else class="space-y-2">
-              <div v-for="(model, index) in form.models" 
-                   :key="index"
-                   class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-3 py-2 group hover:border-orange-200 transition-colors">
+              <div
+                v-for="(model, index) in form.models" 
+                :key="index"
+                class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-3 py-2 group hover:border-orange-200 transition-colors">
                 <span class="text-sm text-gray-700 font-mono">{{ model }}</span>
-                <button @click="removeModel(index)"
-                        type="button" 
-                        class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                  @click="removeModel(index)"
+                  type="button" 
+                  class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -99,15 +105,17 @@
 
           <!-- 添加自定义模型 -->
           <div class="flex space-x-2">
-            <input type="text" 
-                   v-model="customModel"
-                   @keyup.enter="addCustomModel"
-                   class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
-                   placeholder="输入模型名称后按回车添加">
-            <button @click="addCustomModel"
-                    type="button"
-                    :disabled="!customModel.trim() || form.models.includes(customModel.trim())"
-                    class="px-4 py-2 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <input
+              type="text" 
+              v-model="customModel"
+              @keyup.enter="addCustomModel"
+              class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
+              placeholder="输入模型名称后按回车添加">
+            <button
+              @click="addCustomModel"
+              type="button"
+              :disabled="!customModel.trim() || form.models.includes(customModel.trim())"
+              class="px-4 py-2 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               添加
             </button>
           </div>
@@ -120,10 +128,11 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           描述
         </label>
-        <textarea v-model="form.description"
-                  rows="3"
-                  class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200 resize-none"
-                  placeholder="供应商描述信息">
+        <textarea
+          v-model="form.description"
+          rows="3"
+          class="block w-full px-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200 resize-none"
+          placeholder="供应商描述信息">
         </textarea>
       </div>
 
@@ -146,13 +155,15 @@
 
       <!-- 按钮 -->
       <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-        <button type="button" @click="handleCancel"
-                class="px-6 py-3 border border-orange-300 text-orange-600 rounded-xl hover:bg-orange-50 transition duration-200 font-medium">
+        <button
+          type="button" @click="handleCancel"
+          class="px-6 py-3 border border-orange-300 text-orange-600 rounded-xl hover:bg-orange-50 transition duration-200 font-medium">
           {{ isEdit ? '取消' : '重新选择' }}
         </button>
-        <button type="submit" 
-                :disabled="loading"
-                class="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 transition duration-200 shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          type="submit" 
+          :disabled="loading"
+          class="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 transition duration-200 shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
           {{ loading ? (isEdit ? '保存中...' : '添加中...') : (isEdit ? '保存' : '添加供应商') }}
         </button>
       </div>

@@ -6,8 +6,9 @@
           <h3 class="text-xl font-bold text-gray-900">Claude Code 账号管理</h3>
           <p class="text-sm text-gray-600 mt-1">管理多个 Claude Code 账号，支持 OAuth 认证和自动 token 刷新</p>
         </div>
-        <button @click="showAddAccountModal = true" 
-                class="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
+        <button
+          @click="showAddAccountModal = true" 
+          class="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
@@ -16,8 +17,9 @@
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div v-for="account in claudeAccounts" :key="account.id" 
-             class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
+        <div
+          v-for="account in claudeAccounts" :key="account.id" 
+          class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -59,18 +61,21 @@
           </div>
           
           <div class="flex space-x-2">
-            <button v-if="!account.tokenInfo?.hasToken" 
-                    @click="startOAuthFlow(account)" 
-                    class="px-4 py-2 text-orange-600 hover:text-orange-700 rounded-xl border border-orange-200 hover:border-orange-300 transition duration-200 text-sm">
+            <button
+              v-if="!account.tokenInfo?.hasToken" 
+              @click="startOAuthFlow(account)" 
+              class="px-4 py-2 text-orange-600 hover:text-orange-700 rounded-xl border border-orange-200 hover:border-orange-300 transition duration-200 text-sm">
               授权登录
             </button>
-            <button v-if="account.tokenInfo?.hasToken && account.tokenInfo.isExpired" 
-                    @click="refreshAccountToken(account.id)" 
-                    class="px-4 py-2 text-blue-600 hover:text-blue-700 rounded-xl border border-blue-200 hover:border-blue-300 transition duration-200 text-sm">
+            <button
+              v-if="account.tokenInfo?.hasToken && account.tokenInfo.isExpired" 
+              @click="refreshAccountToken(account.id)" 
+              class="px-4 py-2 text-blue-600 hover:text-blue-700 rounded-xl border border-blue-200 hover:border-blue-300 transition duration-200 text-sm">
               刷新 Token
             </button>
-            <button @click="deleteAccount(account.id)" 
-                    class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
+            <button
+              @click="deleteAccount(account.id)" 
+              class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
               删除
             </button>
           </div>
@@ -91,24 +96,28 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">账号名称</label>
-            <input v-model="newAccount.name" type="text" required 
-                   class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
-                   placeholder="输入账号名称">
+            <input
+              v-model="newAccount.name" type="text" required 
+              class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
+              placeholder="输入账号名称">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">描述（可选）</label>
-            <input v-model="newAccount.description" type="text" 
-                   class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
-                   placeholder="输入账号描述">
+            <input
+              v-model="newAccount.description" type="text" 
+              class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
+              placeholder="输入账号描述">
           </div>
         </div>
         <div class="flex space-x-3 mt-6">
-          <button type="button" @click="showAddAccountModal = false" 
-                  class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
+          <button
+            type="button" @click="showAddAccountModal = false" 
+            class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
             取消
           </button>
-          <button type="submit" 
-                  class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200">
+          <button
+            type="submit" 
+            class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200">
             添加
           </button>
         </div>
@@ -128,12 +137,14 @@
           <p class="text-sm text-orange-600 mt-1">授权完成后，请从浏览器地址栏复制 code 参数的值</p>
         </div>
         <div class="flex space-x-3">
-          <button @click="showOAuthModal = false" 
-                  class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
+          <button
+            @click="showOAuthModal = false" 
+            class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
             取消
           </button>
-          <button @click="openAuthUrl" 
-                  class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200">
+          <button
+            @click="openAuthUrl" 
+            class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200">
             前往授权
           </button>
         </div>
@@ -141,16 +152,19 @@
       
       <div v-if="oauthStep === 2" class="space-y-4">
         <p class="text-sm text-gray-600">请粘贴从地址栏复制的授权码</p>
-        <input v-model="authCode" type="text" 
-               class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
-               placeholder="粘贴授权码...">
+        <input
+          v-model="authCode" type="text" 
+          class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" 
+          placeholder="粘贴授权码...">
         <div class="flex space-x-3">
-          <button @click="showOAuthModal = false" 
-                  class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
+          <button
+            @click="showOAuthModal = false" 
+            class="flex-1 py-2 px-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition duration-200">
             取消
           </button>
-          <button @click="exchangeToken" :disabled="!authCode"
-                  class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          <button
+            @click="exchangeToken" :disabled="!authCode"
+            class="flex-1 py-2 px-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
             完成授权
           </button>
         </div>

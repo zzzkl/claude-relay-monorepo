@@ -17,6 +17,40 @@ import type { Bindings } from '../../types/env'
 
 const clientKeysRoutes = new Hono<{ Bindings: Bindings }>()
 
+// 获取总体统计信息
+clientKeysRoutes.get('/stats', async (c) => {
+  const service = new ClientApiKeyService(c.env.CLAUDE_RELAY_ADMIN_KV)
+  
+  try {
+    const stats = await service.getOverallStats()
+    return createSuccessResponse(stats, '获取统计信息成功')
+  } catch (error: any) {
+    console.error('Failed to get overall stats:', error)
+    throw new HTTPException(500, {
+      message: '获取统计信息失败'
+    })
+  }
+})
+
+// 获取用量排行
+clientKeysRoutes.get('/usage-ranking', async (c) => {
+  const service = new ClientApiKeyService(c.env.CLAUDE_RELAY_ADMIN_KV)
+  
+  const metric = c.req.query('metric') as 'requests' | 'input_tokens' | 'output_tokens' | 'total_tokens' || 'requests'
+  const period = c.req.query('period') as 'today' | 'week' | 'month' | 'all' || 'all'
+  const limit = parseInt(c.req.query('limit') || '10')
+  
+  try {
+    const ranking = await service.getUsageRanking({ metric, period, limit })
+    return createSuccessResponse(ranking, '获取用量排行成功')
+  } catch (error: any) {
+    console.error('Failed to get usage ranking:', error)
+    throw new HTTPException(500, {
+      message: '获取用量排行失败'
+    })
+  }
+})
+
 // 获取所有客户端 API Key 列表
 clientKeysRoutes.get('/', async (c) => {
   try {
@@ -263,6 +297,35 @@ clientKeysRoutes.get('/:keyId/stats', async (c) => {
     
     throw new HTTPException(500, {
       message: '获取使用统计失败'
+    })
+  }
+})
+
+// 获取单个 Key 的 Token 使用历史
+clientKeysRoutes.get('/:keyId/token-history', async (c) => {
+  try {
+    const keyId = c.req.param('keyId')
+    const period = c.req.query('period') as 'day' | 'week' | 'month' || 'week'
+    const service = new ClientApiKeyService(c.env.CLAUDE_RELAY_ADMIN_KV)
+    
+    const history = await service.getTokenHistory(keyId, period)
+    
+    return createSuccessResponse(history, '获取 Token 使用历史成功')
+  } catch (error: any) {
+    console.error('Failed to get token history:', error)
+    
+    if (error instanceof HTTPException) {
+      throw error
+    }
+    
+    if (error.message && error.message.includes('KEY_NOT_FOUND')) {
+      throw new HTTPException(404, {
+        message: '客户端 API Key 不存在'
+      })
+    }
+    
+    throw new HTTPException(500, {
+      message: '获取 Token 使用历史失败'
     })
   }
 })

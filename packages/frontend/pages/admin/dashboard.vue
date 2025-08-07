@@ -31,8 +31,9 @@
               <span class="text-sm font-medium text-orange-600">{{ currentModelDisplay }}</span>
             </div>
             
-            <button @click="logout" 
-                    class="text-gray-500 hover:text-orange-600 px-3 py-2 rounded-xl hover:bg-white/50 transition duration-200">
+            <button
+              @click="logout" 
+              class="text-gray-500 hover:text-orange-600 px-3 py-2 rounded-xl hover:bg-white/50 transition duration-200">
               退出登录
             </button>
           </div>
@@ -48,9 +49,10 @@
         <!-- 标签页导航 -->
         <div class="bg-white/50 backdrop-blur-sm rounded-2xl p-1 mb-8">
           <nav class="flex space-x-1">
-            <button @click="activeTab = 'claude-accounts'"
-                    :class="activeTab === 'claude-accounts' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
-                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+            <button
+              @click="activeTab = 'claude-accounts'"
+              :class="activeTab === 'claude-accounts' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+              class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
               <div class="flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -58,9 +60,10 @@
                 <span>Claude 账号</span>
               </div>
             </button>
-            <button @click="activeTab = 'providers'" 
-                    :class="activeTab === 'providers' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
-                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+            <button
+              @click="activeTab = 'providers'" 
+              :class="activeTab === 'providers' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+              class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
               <div class="flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -68,9 +71,10 @@
                 <span>模型供应商</span>
               </div>
             </button>
-            <button @click="activeTab = 'models'"
-                    :class="activeTab === 'models' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
-                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+            <button
+              @click="activeTab = 'models'"
+              :class="activeTab === 'models' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+              class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
               <div class="flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -78,9 +82,10 @@
                 <span>模型选择</span>
               </div>
             </button>
-            <button @click="activeTab = 'routes'"
-                    :class="activeTab === 'routes' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
-                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+            <button
+              @click="activeTab = 'routes'"
+              :class="activeTab === 'routes' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+              class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
               <div class="flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
@@ -88,9 +93,10 @@
                 <span>路由配置</span>
               </div>
             </button>
-            <button @click="activeTab = 'client-keys'"
-                    :class="activeTab === 'client-keys' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
-                    class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
+            <button
+              @click="activeTab = 'client-keys'"
+              :class="activeTab === 'client-keys' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-orange-600 hover:bg-white/50'"
+              class="flex-1 py-3 px-6 text-sm font-medium rounded-xl transition duration-200">
               <div class="flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>

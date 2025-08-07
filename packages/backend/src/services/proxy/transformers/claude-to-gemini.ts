@@ -149,44 +149,44 @@ export class ClaudeToGeminiTransformer implements Transformer {
     } else if (Array.isArray(content)) {
       for (const item of content) {
         switch (item.type) {
-          case 'text':
-            parts.push({ text: (item as TextBlockParam).text })
-            break
-          case 'image':
-            const imageBlock = item as ImageBlockParam
-            if (imageBlock.source.type === 'base64') {
-              parts.push({
-                inlineData: {
-                  mimeType: imageBlock.source.media_type,
-                  data: imageBlock.source.data
-                }
-              })
+        case 'text':
+          parts.push({ text: (item as TextBlockParam).text })
+          break
+        case 'image':
+          const imageBlock = item as ImageBlockParam
+          if (imageBlock.source.type === 'base64') {
+            parts.push({
+              inlineData: {
+                mimeType: imageBlock.source.media_type,
+                data: imageBlock.source.data
+              }
+            })
+          }
+          break
+        case 'tool_use':
+          const toolUseBlock = item as ToolUseBlockParam
+          this.toolUseIdToFunctionName.set(toolUseBlock.id, toolUseBlock.name)
+          parts.push({
+            functionCall: {
+              name: toolUseBlock.name,
+              args: (toolUseBlock.input as Record<string, unknown>) || {}
             }
-            break
-          case 'tool_use':
-            const toolUseBlock = item as ToolUseBlockParam
-            this.toolUseIdToFunctionName.set(toolUseBlock.id, toolUseBlock.name)
-            parts.push({
-              functionCall: {
-                name: toolUseBlock.name,
-                args: (toolUseBlock.input as Record<string, unknown>) || {}
+          })
+          break
+        case 'tool_result':
+          const toolResultBlock = item as ToolResultBlockParam
+          const functionName = this.toolUseIdToFunctionName.get(toolResultBlock.tool_use_id) || 'unknown_function'
+          parts.push({
+            functionResponse: {
+              name: functionName,
+              response: {
+                result: typeof toolResultBlock.content === 'string' 
+                  ? toolResultBlock.content 
+                  : JSON.stringify(toolResultBlock.content)
               }
-            })
-            break
-          case 'tool_result':
-            const toolResultBlock = item as ToolResultBlockParam
-            const functionName = this.toolUseIdToFunctionName.get(toolResultBlock.tool_use_id) || 'unknown_function'
-            parts.push({
-              functionResponse: {
-                name: functionName,
-                response: {
-                  result: typeof toolResultBlock.content === 'string' 
-                    ? toolResultBlock.content 
-                    : JSON.stringify(toolResultBlock.content)
-                }
-              }
-            })
-            break
+            }
+          })
+          break
         }
       }
     }
@@ -213,8 +213,8 @@ export class ClaudeToGeminiTransformer implements Transformer {
   private transformToolChoice(toolChoice: MessageCreateParamsBase['tool_choice']): ToolConfig {
     if (typeof toolChoice === 'string') {
       const mode = toolChoice === 'auto' ? 'AUTO' 
-                 : toolChoice === 'none' ? 'NONE' 
-                 : 'ANY'
+        : toolChoice === 'none' ? 'NONE' 
+          : 'ANY'
       return { functionCallingConfig: { mode: mode as any } }
     }
     

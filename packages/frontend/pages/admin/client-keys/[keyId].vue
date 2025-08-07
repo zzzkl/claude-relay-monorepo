@@ -21,7 +21,8 @@
     <!-- 错误状态 -->
     <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 text-center">
       <svg class="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+        <path
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <h3 class="mt-2 text-lg font-medium text-red-900 dark:text-red-200">加载失败</h3>
@@ -141,7 +142,7 @@
         
         <div v-if="keyData.stats" class="space-y-6">
           <!-- 统计概览 -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
               <p class="text-sm text-gray-600 dark:text-gray-400">总请求数</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ keyData.stats.totalRequests }}</p>
@@ -151,13 +152,64 @@
               <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ getTodayUsage() }}</p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <p class="text-sm text-gray-600 dark:text-gray-400">最后更新</p>
-              <p class="text-sm text-gray-900 dark:text-white">{{ formatDate(keyData.stats.lastUpdated) }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">总 Input Tokens</p>
+              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ formatNumber(keyData.stats.totalInputTokens || 0) }}</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p class="text-sm text-gray-600 dark:text-gray-400">总 Output Tokens</p>
+              <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatNumber(keyData.stats.totalOutputTokens || 0) }}</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p class="text-sm text-gray-600 dark:text-gray-400">平均 Tokens/请求</p>
+              <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ getAverageTokensPerRequest() }}</p>
             </div>
           </div>
 
-          <!-- 每日使用图表（简单展示） -->
-          <div v-if="Object.keys(keyData.stats.dailyUsage).length > 0">
+          <!-- Token 使用趋势 -->
+          <div v-if="keyData.stats.dailyTokenUsage && Object.keys(keyData.stats.dailyTokenUsage).length > 0">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Token 使用趋势（最近7天）</h3>
+            <div class="space-y-3">
+              <div 
+                v-for="item in getRecentTokenUsage()" 
+                :key="item.date"
+                class="border border-gray-200 dark:border-gray-600 rounded-lg p-3"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.date }}</span>
+                  <span class="text-xs text-gray-500">{{ item.requests }} 请求</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-600 dark:text-gray-400">Input</span>
+                      <span class="text-xs font-medium text-blue-600">{{ formatNumber(item.inputTokens) }}</span>
+                    </div>
+                    <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-1">
+                      <div 
+                        class="bg-blue-600 h-2 rounded-full"
+                        :style="`width: ${getTokenPercentage(item.inputTokens, 'input')}%`"
+                      ></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-600 dark:text-gray-400">Output</span>
+                      <span class="text-xs font-medium text-green-600">{{ formatNumber(item.outputTokens) }}</span>
+                    </div>
+                    <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-1">
+                      <div 
+                        class="bg-green-600 h-2 rounded-full"
+                        :style="`width: ${getTokenPercentage(item.outputTokens, 'output')}%`"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 请求使用记录（简单展示） -->
+          <div v-else-if="Object.keys(keyData.stats.dailyUsage).length > 0">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">最近使用记录</h3>
             <div class="space-y-2">
               <div 
@@ -303,6 +355,51 @@ const getUsagePercentage = (count: number) => {
   if (maxCount === 0) return 0
   
   return Math.round((count / maxCount) * 100)
+}
+
+// 格式化数字
+const formatNumber = (num: number) => {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`
+  }
+  return num.toString()
+}
+
+// 获取平均 Tokens/请求
+const getAverageTokensPerRequest = () => {
+  if (!keyData.value?.stats) return '0'
+  const { totalRequests, totalInputTokens = 0, totalOutputTokens = 0 } = keyData.value.stats
+  if (totalRequests === 0) return '0'
+  const avgTokens = (totalInputTokens + totalOutputTokens) / totalRequests
+  return formatNumber(Math.round(avgTokens))
+}
+
+// 获取最近的 Token 使用记录
+const getRecentTokenUsage = () => {
+  if (!keyData.value?.stats?.dailyTokenUsage) return []
+  
+  const usage = keyData.value.stats.dailyTokenUsage
+  const dates = Object.keys(usage).sort().reverse().slice(0, 7)
+  
+  return dates.map(date => ({
+    date,
+    ...usage[date]
+  }))
+}
+
+// 计算 Token 百分比
+const getTokenPercentage = (value: number, type: 'input' | 'output') => {
+  if (!keyData.value?.stats?.dailyTokenUsage) return 0
+  
+  const allValues = Object.values(keyData.value.stats.dailyTokenUsage)
+  const maxValue = Math.max(
+    ...allValues.map(v => type === 'input' ? v.inputTokens : v.outputTokens)
+  )
+  
+  if (maxValue === 0) return 0
+  return Math.round((value / maxValue) * 100)
 }
 
 // 切换状态
