@@ -5,55 +5,106 @@
 import type { MessageCreateParamsBase } from '@anthropic-ai/sdk/resources/messages'
 import type { SelectedConfig } from './engines/types'
 import { ClaudeEngine, ProviderEngine } from './engines'
-import { RouteConfigRepository } from '../../repositories'
 import { ValidationError } from '../../utils/errors'
 import { ClientApiKeyService } from '../admin/client-keys'
+import { CachedKVStore } from '../../utils/cached-kv-store'
+
+// 全局实例缓存
+const serviceInstances = new Map<string, any>()
 
 export class ClaudeProxyService {
   private claudeEngine: ClaudeEngine
   private providerEngine: ProviderEngine
-  private routeConfigRepo: RouteConfigRepository
   private clientKeyService: ClientApiKeyService
+  private cachedKV: CachedKVStore
+  private cacheHit: boolean = false
   
   constructor(private kv: KVNamespace) {
-    this.claudeEngine = new ClaudeEngine(kv)
-    this.providerEngine = new ProviderEngine(kv)
-    this.routeConfigRepo = new RouteConfigRepository(kv)
-    this.clientKeyService = new ClientApiKeyService(kv)
+    const kvId = kv.constructor.name // 使用 KV 实例作为缓存键
+    
+    // 复用或创建 ClaudeEngine 实例
+    const claudeKey = `claude_${kvId}`
+    if (!serviceInstances.has(claudeKey)) {
+      serviceInstances.set(claudeKey, new ClaudeEngine(kv))
+    }
+    this.claudeEngine = serviceInstances.get(claudeKey)
+    
+    // 复用或创建 ProviderEngine 实例
+    const providerKey = `provider_${kvId}`
+    if (!serviceInstances.has(providerKey)) {
+      serviceInstances.set(providerKey, new ProviderEngine(kv))
+    }
+    this.providerEngine = serviceInstances.get(providerKey)
+    
+    // 复用或创建 ClientApiKeyService 实例
+    const clientKey = `client_${kvId}`
+    if (!serviceInstances.has(clientKey)) {
+      serviceInstances.set(clientKey, new ClientApiKeyService(kv))
+    }
+    this.clientKeyService = serviceInstances.get(clientKey)
+    
+    // 复用或创建 CachedKVStore 实例
+    const cachedKey = `cached_${kvId}`
+    if (!serviceInstances.has(cachedKey)) {
+      serviceInstances.set(cachedKey, new CachedKVStore(kv, {
+        maxSize: 20,
+        defaultTTL: 5 * 60 * 1000  // 5 分钟
+      }))
+    }
+    this.cachedKV = serviceInstances.get(cachedKey)
   }
   
   /**
    * 代理请求到适当的 API 端点
    * @param request 原始请求
    * @param clientId 客户端 ID（如果有）
+   * @param ctx 执行上下文（用于异步任务）
    */
-  async proxyRequest(request: Request, clientId?: string): Promise<Response> {
+  async proxyRequest(request: Request, clientId?: string, ctx?: ExecutionContext): Promise<Response> {
+    const startTime = Date.now()
+    
     // 解析请求
     const claudeRequest = await request.json() as MessageCreateParamsBase
     
-    // 获取选择的配置
-    const selectedConfig = await this.routeConfigRepo.getSelectedConfig()
+    // 获取选择的配置（使用缓存）
+    const selectedConfig = await this.getSelectedConfigCached()
     
     let response: Response
     
+    // 优化：默认使用 Claude，减少判断开销
     if (!selectedConfig || selectedConfig.type === 'claude') {
+      // 直接调用 Claude Engine，跳过不必要的中间层
+      const engineStartTime = Date.now()
       response = await this.claudeEngine.processRequest(claudeRequest)
+      console.log(`Claude Engine processed in ${Date.now() - engineStartTime}ms`)
     } else if (selectedConfig.type === 'route') {
       response = await this.providerEngine.processRequest(claudeRequest)
     } else {
       throw new ValidationError(`Unknown configuration type: ${selectedConfig.type}`)
     }
     
-    // 如果有 clientId，提取并记录 token 使用
-    // 重要：必须等待此操作完成，否则在 Cloudflare Workers 中会被中断
-    if (clientId) {
+    // 如果有 clientId，异步记录 token 使用
+    if (clientId && ctx) {
+      // 使用 waitUntil 在后台异步执行，不阻塞响应
+      ctx.waitUntil(
+        this.extractAndRecordTokenUsage(response.clone(), clientId, claudeRequest.stream || false)
+          .catch(error => {
+            // 记录错误但不影响主流程
+            console.error('Failed to record token usage for client:', clientId, error)
+          })
+      )
+    } else if (clientId && !ctx) {
+      // 如果没有 ctx，降级为同步处理（保持向后兼容）
       try {
         await this.extractAndRecordTokenUsage(response.clone(), clientId, claudeRequest.stream || false)
       } catch (error) {
-        // 记录错误但不影响主流程
         console.error('Failed to record token usage for client:', clientId, error)
       }
     }
+    
+    // 记录处理时间
+    const processingTime = Date.now() - startTime
+    console.log(`Request processed in ${processingTime}ms, cache hit: ${this.cacheHit}`)
     
     return response
   }
@@ -98,6 +149,22 @@ export class ClaudeProxyService {
       }
       throw error // 重新抛出错误，让上层处理
     }
+  }
+  
+  /**
+   * 获取缓存的配置
+   */
+  private async getSelectedConfigCached(): Promise<SelectedConfig | null> {
+    const config = await this.cachedKV.get<SelectedConfig>('admin_selected_config', 5 * 60 * 1000)
+    this.cacheHit = config !== null
+    return config
+  }
+  
+  /**
+   * 获取缓存状态
+   */
+  getCacheStatus(): string {
+    return this.cacheHit ? 'HIT' : 'MISS'
   }
   
   /**

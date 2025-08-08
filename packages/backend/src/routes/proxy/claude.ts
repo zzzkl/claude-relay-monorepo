@@ -19,13 +19,19 @@ claudeRoutes.use('/messages', optionalClientAuth())
  * POST /v1/messages - 代理 Claude API 消息请求
  */
 claudeRoutes.post('/messages', async (c) => {
+  const startTime = Date.now()
   const claudeService = new ClaudeProxyService(c.env.CLAUDE_RELAY_ADMIN_KV)
   
   // 获取客户端 ID
   const clientId = getClientId(c)
   
-  // 代理请求，传递 clientId 以便记录 token 使用
-  const response = await claudeService.proxyRequest(c.req.raw, clientId)
+  // 代理请求，传递 clientId 和 context 以便异步记录 token 使用
+  const response = await claudeService.proxyRequest(c.req.raw, clientId, c.executionCtx)
+  
+  // 添加性能监控响应头
+  const processingTime = Date.now() - startTime
+  response.headers.set('X-Processing-Time', `${processingTime}ms`)
+  response.headers.set('X-Cache-Status', claudeService.getCacheStatus())
   
   return response
 })
