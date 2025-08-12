@@ -85,17 +85,10 @@
             <div v-if="form.models.length === 0" class="text-sm text-gray-500 italic py-3 px-4 border border-dashed border-gray-200 rounded-xl text-center">
               请添加至少一个模型
             </div>
-<<<<<<< HEAD
             <div v-else class="space-y-2 max-h-64 overflow-y-auto pr-2">
               <div v-for="(model, index) in form.models" 
                    :key="index"
                    class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-3 py-2 group hover:border-orange-200 transition-colors">
-=======
-            <div v-else class="space-y-2 max-h-64 overflow-y-auto pr-2">
-              <div v-for="(model, index) in form.models" 
-                   :key="index"
-                   class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-3 py-2 group hover:border-orange-200 transition-colors">
->>>>>>> main
                 <span class="text-sm text-gray-700 font-mono">{{ model }}</span>
                 <button
                   @click="removeModel(index)"
