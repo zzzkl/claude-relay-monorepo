@@ -75,20 +75,20 @@ export class OptimizedTokenEstimator {
     // 根据内容类型估算
     let tokenCount: number
     switch (contentType) {
-      case 'chinese':
-        tokenCount = this.estimateChinese(text)
-        break
-      case 'code':
-        tokenCount = this.estimateCode(text)
-        break
-      case 'json':
-        tokenCount = this.estimateJSON(text)
-        break
-      case 'english':
-        tokenCount = this.estimateEnglish(text)
-        break
-      default:
-        tokenCount = this.estimateMixed(text)
+    case 'chinese':
+      tokenCount = this.estimateChinese(text)
+      break
+    case 'code':
+      tokenCount = this.estimateCode(text)
+      break
+    case 'json':
+      tokenCount = this.estimateJSON(text)
+      break
+    case 'english':
+      tokenCount = this.estimateEnglish(text)
+      break
+    default:
+      tokenCount = this.estimateMixed(text)
     }
     
     // 缓存结果
@@ -232,7 +232,7 @@ export class OptimizedTokenEstimator {
       if (word.length === 0) continue
       
       // 缩写（如 don't）通常分解为 2 个 token
-      if (word.includes("'")) {
+      if (word.includes('\'')) {
         tokenCount += 2
       }
       // 超长单词会被分割

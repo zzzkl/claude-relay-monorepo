@@ -5,19 +5,35 @@
 
 import { Hono } from 'hono'
 import { ClaudeProxyService } from '../../services/proxy/claude-proxy'
+import { optionalClientAuth, getClientId } from '../../middleware/client-auth'
+import { ClientApiKeyService } from '../../services/admin/client-keys'
 import type { Bindings } from '../../types/env'
 
 const claudeRoutes = new Hono<{ Bindings: Bindings }>()
+
+// 应用客户端认证中间件（可选的，如果提供了就验证）
+claudeRoutes.use('/messages', optionalClientAuth())
 
 /**
  * Claude Messages API 代理
  * POST /v1/messages - 代理 Claude API 消息请求
  */
 claudeRoutes.post('/messages', async (c) => {
+  const startTime = Date.now()
   const claudeService = new ClaudeProxyService(c.env.CLAUDE_RELAY_ADMIN_KV)
   
-  // 直接返回代理服务的响应，异常由全局错误处理中间件捕获
-  return await claudeService.proxyRequest(c.req.raw)
+  // 获取客户端 ID
+  const clientId = getClientId(c)
+  
+  // 代理请求，传递 clientId 和 context 以便异步记录 token 使用
+  const response = await claudeService.proxyRequest(c.req.raw, clientId, c.executionCtx)
+  
+  // 添加性能监控响应头
+  const processingTime = Date.now() - startTime
+  response.headers.set('X-Processing-Time', `${processingTime}ms`)
+  response.headers.set('X-Cache-Status', claudeService.getCacheStatus())
+  
+  return response
 })
 
 /**

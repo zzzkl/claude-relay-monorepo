@@ -18,8 +18,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment files (if needed for future use)
+# Environment files (含敏感信息)
 .env
+.env.*
+!.env.example
 .env.local
 .env.production
 .env.development
@@ -35,11 +37,19 @@ lerna-debug.log*
 # Claude Code
 .claude/settings.local.json
 
+# Kiro IDE
+.kiro/
+
 # Cloudflare
 .wrangler/
 # Note: wrangler.toml files are kept for development use
 packages/backend/wrangler.toml
 packages/frontend/wrangler.toml
+
+# Deployment artifacts
+deploy/
+deploy/wrangler.toml
+deploy/assets/
 
 # Local KV Storage
 .kv-storage/

@@ -6,8 +6,9 @@
           <h3 class="text-xl font-bold text-gray-900">路由配置管理</h3>
           <p class="text-sm text-gray-600 mt-1">配置智能路由规则，实现请求的动态分发到最合适的模型</p>
         </div>
-        <button @click="navigateTo('/admin/add-route-config')" 
-                class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
+        <button
+          @click="navigateTo('/admin/add-route-config')" 
+          class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg flex items-center space-x-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
@@ -16,8 +17,9 @@
       </div>
       
       <div class="space-y-6">
-        <div v-for="routeConfig in routeConfigs" :key="routeConfig.id" 
-             class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
+        <div
+          v-for="routeConfig in routeConfigs" :key="routeConfig.id" 
+          class="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 hover:shadow-lg transition duration-300 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
@@ -109,12 +111,14 @@
           </div>
           
           <div class="flex space-x-2">
-            <button @click="editRouteConfig(routeConfig)" 
-                    class="px-4 py-2 text-blue-600 hover:text-blue-700 rounded-xl border border-blue-200 hover:border-blue-300 transition duration-200 text-sm">
+            <button
+              @click="editRouteConfig(routeConfig)" 
+              class="px-4 py-2 text-blue-600 hover:text-blue-700 rounded-xl border border-blue-200 hover:border-blue-300 transition duration-200 text-sm">
               编辑
             </button>
-            <button @click="deleteRouteConfig(routeConfig.id)" 
-                    class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
+            <button
+              @click="deleteRouteConfig(routeConfig.id)" 
+              class="px-4 py-2 text-red-600 hover:text-red-700 rounded-xl border border-red-200 hover:border-red-300 transition duration-200 text-sm">
               删除
             </button>
           </div>
@@ -132,8 +136,9 @@
             <p class="text-gray-500 text-lg font-medium">暂无路由配置</p>
             <p class="text-gray-400 text-sm mt-1">创建路由配置以启用智能模型选择功能</p>
           </div>
-          <button @click="showAddRouteModal = true" 
-                  class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg">
+          <button
+            @click="showAddRouteModal = true" 
+            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition duration-200 shadow-lg">
             创建第一个路由配置
           </button>
         </div>

@@ -7,20 +7,22 @@
           <label class="block text-sm font-medium text-gray-700 mb-1">
             配置名称 <span class="text-red-500">*</span>
           </label>
-          <input type="text" 
-                 v-model="form.name"
-                 required
-                 class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                 placeholder="例如：高性能路由策略">
+          <input
+            type="text" 
+            v-model="form.name"
+            required
+            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="例如：高性能路由策略">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
             描述
           </label>
-          <input type="text"
-                 v-model="form.description"
-                 class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                 placeholder="简短描述">
+          <input
+            type="text"
+            v-model="form.description"
+            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="简短描述">
         </div>
       </div>
     </div>
@@ -31,7 +33,6 @@
       
       <!-- 模型卡片网格 -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        
         <!-- 默认模型 -->
         <div class="border border-green-200 bg-green-50/30 rounded-lg p-3.5">
           <div class="flex items-center justify-between mb-2">
@@ -43,21 +44,24 @@
           </div>
           <p class="text-xs text-gray-600 mb-2">所有请求的基础路由</p>
           <div class="grid grid-cols-2 gap-2">
-            <select v-model="form.rules.default.providerId"
-                    required
-                    @change="handleProviderChange('default')"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500">
+            <select
+              v-model="form.rules.default.providerId"
+              required
+              @change="handleProviderChange('default')"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500">
               <option value="">选择供应商</option>
               <option v-for="provider in availableProviders" :key="provider.id" :value="provider.id">
                 {{ provider.name }}
               </option>
             </select>
-            <select v-model="form.rules.default.model"
-                    required
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500">
+            <select
+              v-model="form.rules.default.model"
+              required
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-500">
               <option value="">选择模型</option>
-              <option v-for="model in getAvailableModels(form.rules.default.providerId)" 
-                      :key="model" :value="model">
+              <option
+                v-for="model in getAvailableModels(form.rules.default.providerId)" 
+                :key="model" :value="model">
                 {{ model }}
               </option>
             </select>
@@ -75,30 +79,34 @@
           </div>
           <p class="text-xs text-gray-600 mb-2">处理长文档和对话</p>
           <div class="grid grid-cols-2 gap-2 mb-2">
-            <select v-model="form.rules.longContext.providerId"
-                    @change="handleProviderChange('longContext')"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500">
+            <select
+              v-model="form.rules.longContext.providerId"
+              @change="handleProviderChange('longContext')"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500">
               <option value="">不使用</option>
               <option v-for="provider in availableProviders" :key="provider.id" :value="provider.id">
                 {{ provider.name }}
               </option>
             </select>
-            <select v-model="form.rules.longContext.model"
-                    :disabled="!form.rules.longContext.providerId"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 disabled:bg-gray-50">
+            <select
+              v-model="form.rules.longContext.model"
+              :disabled="!form.rules.longContext.providerId"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 disabled:bg-gray-50">
               <option value="">选择模型</option>
-              <option v-for="model in getAvailableModels(form.rules.longContext.providerId)" 
-                      :key="model" :value="model">
+              <option
+                v-for="model in getAvailableModels(form.rules.longContext.providerId)" 
+                :key="model" :value="model">
                 {{ model }}
               </option>
             </select>
           </div>
           <div v-if="form.rules.longContext.providerId" class="flex items-center space-x-2">
-            <input type="number" 
-                   v-model.number="form.config.longContextThreshold"
-                   min="1000"
-                   step="1000"
-                   class="w-20 px-2 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500">
+            <input
+              type="number" 
+              v-model.number="form.config.longContextThreshold"
+              min="1000"
+              step="1000"
+              class="w-20 px-2 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500">
             <span class="text-xs text-gray-500">字符阈值</span>
           </div>
         </div>
@@ -114,20 +122,23 @@
           </div>
           <p class="text-xs text-gray-600 mb-2">快速响应的轻量任务</p>
           <div class="grid grid-cols-2 gap-2">
-            <select v-model="form.rules.background.providerId"
-                    @change="handleProviderChange('background')"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+            <select
+              v-model="form.rules.background.providerId"
+              @change="handleProviderChange('background')"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
               <option value="">不使用</option>
               <option v-for="provider in availableProviders" :key="provider.id" :value="provider.id">
                 {{ provider.name }}
               </option>
             </select>
-            <select v-model="form.rules.background.model"
-                    :disabled="!form.rules.background.providerId"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50">
+            <select
+              v-model="form.rules.background.model"
+              :disabled="!form.rules.background.providerId"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50">
               <option value="">选择模型</option>
-              <option v-for="model in getAvailableModels(form.rules.background.providerId)" 
-                      :key="model" :value="model">
+              <option
+                v-for="model in getAvailableModels(form.rules.background.providerId)" 
+                :key="model" :value="model">
                 {{ model }}
               </option>
             </select>
@@ -145,20 +156,23 @@
           </div>
           <p class="text-xs text-gray-600 mb-2">复杂推理和数学问题</p>
           <div class="grid grid-cols-2 gap-2">
-            <select v-model="form.rules.think.providerId"
-                    @change="handleProviderChange('think')"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-purple-500">
+            <select
+              v-model="form.rules.think.providerId"
+              @change="handleProviderChange('think')"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-purple-500">
               <option value="">不使用</option>
               <option v-for="provider in availableProviders" :key="provider.id" :value="provider.id">
                 {{ provider.name }}
               </option>
             </select>
-            <select v-model="form.rules.think.model"
-                    :disabled="!form.rules.think.providerId"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 disabled:bg-gray-50">
+            <select
+              v-model="form.rules.think.model"
+              :disabled="!form.rules.think.providerId"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 disabled:bg-gray-50">
               <option value="">选择模型</option>
-              <option v-for="model in getAvailableModels(form.rules.think.providerId)" 
-                      :key="model" :value="model">
+              <option
+                v-for="model in getAvailableModels(form.rules.think.providerId)" 
+                :key="model" :value="model">
                 {{ model }}
               </option>
             </select>
@@ -176,39 +190,43 @@
           </div>
           <p class="text-xs text-gray-600 mb-2">实时信息检索</p>
           <div class="grid grid-cols-2 gap-2">
-            <select v-model="form.rules.webSearch.providerId"
-                    @change="handleProviderChange('webSearch')"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500">
+            <select
+              v-model="form.rules.webSearch.providerId"
+              @change="handleProviderChange('webSearch')"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500">
               <option value="">不使用</option>
               <option v-for="provider in availableProviders" :key="provider.id" :value="provider.id">
                 {{ provider.name }}
               </option>
             </select>
-            <select v-model="form.rules.webSearch.model"
-                    :disabled="!form.rules.webSearch.providerId"
-                    class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50">
+            <select
+              v-model="form.rules.webSearch.model"
+              :disabled="!form.rules.webSearch.providerId"
+              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50">
               <option value="">选择模型</option>
-              <option v-for="model in getAvailableModels(form.rules.webSearch.providerId)" 
-                      :key="model" :value="model">
+              <option
+                v-for="model in getAvailableModels(form.rules.webSearch.providerId)" 
+                :key="model" :value="model">
                 {{ model }}
               </option>
             </select>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- 操作按钮 -->
     <div class="flex justify-end space-x-3">
-      <button type="button" 
-              @click="handleCancel"
-              class="px-4 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition">
+      <button
+        type="button" 
+        @click="handleCancel"
+        class="px-4 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition">
         取消
       </button>
-      <button type="submit" 
-              :disabled="loading || !isFormValid"
-              class="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+      <button
+        type="submit" 
+        :disabled="loading || !isFormValid"
+        class="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
         {{ loading ? (isEdit ? '保存中...' : '创建中...') : (isEdit ? '保存' : '创建配置') }}
       </button>
     </div>

@@ -4,44 +4,40 @@
 
 import type { RouteConfig } from '../../../../shared/types/admin/routes'
 import type { SelectedConfig } from '../services/proxy/engines/types'
+import { CachedKVStore } from '../utils/cached-kv-store'
 
 export class RouteConfigRepository {
   private readonly ROUTE_CONFIGS_KEY = 'admin_route_configs'
+  private cachedKV: CachedKVStore
   
-  constructor(private kv: KVNamespace) {}
+  constructor(private kv: KVNamespace) {
+    // 创建缓存的 KV 存储
+    this.cachedKV = new CachedKVStore(kv, {
+      maxSize: 10,
+      defaultTTL: 5 * 60 * 1000  // 5 分钟
+    })
+  }
 
   /**
    * 获取所有路由配置
    */
   async getAllConfigs(): Promise<RouteConfig[]> {
-    const data = await this.kv.get(this.ROUTE_CONFIGS_KEY)
-    if (!data) {
-      return []
-    }
-    
-    try {
-      return JSON.parse(data)
-    } catch {
-      return []
-    }
+    const configs = await this.cachedKV.get<RouteConfig[]>(this.ROUTE_CONFIGS_KEY, 5 * 60 * 1000)
+    return configs || []
   }
   
   /**
    * 保存所有路由配置
    */
   async saveAllConfigs(configs: RouteConfig[]): Promise<void> {
-    await this.kv.put(this.ROUTE_CONFIGS_KEY, JSON.stringify(configs))
+    await this.cachedKV.put(this.ROUTE_CONFIGS_KEY, configs, 5 * 60 * 1000)
   }
 
   /**
    * 获取当前选择的配置
    */
   async getSelectedConfig(): Promise<SelectedConfig | null> {
-    const data = await this.kv.get('admin_selected_config')
-    if (!data) {
-      return null
-    }
-    return JSON.parse(data) as SelectedConfig
+    return await this.cachedKV.get<SelectedConfig>('admin_selected_config', 5 * 60 * 1000)
   }
 
   /**
@@ -69,7 +65,7 @@ export class RouteConfigRepository {
    * 保存选择的配置
    */
   async setSelectedConfig(config: SelectedConfig): Promise<void> {
-    await this.kv.put('admin_selected_config', JSON.stringify(config))
+    await this.cachedKV.put('admin_selected_config', config, 5 * 60 * 1000)
   }
 
   /**

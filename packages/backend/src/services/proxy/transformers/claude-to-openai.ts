@@ -187,50 +187,50 @@ export class ClaudeToOpenAITransformer implements Transformer {
 
       for (const item of message.content) {
         switch (item.type) {
-          case 'text':
-            const textBlock = item as TextBlockParam
+        case 'text':
+          const textBlock = item as TextBlockParam
+          content.push({
+            type: 'text',
+            text: textBlock.text
+          })
+          break
+
+        case 'image':
+          const imageBlock = item as ImageBlockParam
+          if (imageBlock.source.type === 'base64') {
             content.push({
-              type: 'text',
-              text: textBlock.text
-            })
-            break
-
-          case 'image':
-            const imageBlock = item as ImageBlockParam
-            if (imageBlock.source.type === 'base64') {
-              content.push({
-                type: 'image_url',
-                image_url: {
-                  url: `data:${imageBlock.source.media_type};base64,${imageBlock.source.data}`,
-                  detail: 'auto' as const
-                }
-              })
-            }
-            break
-
-          case 'tool_use':
-            const toolUseBlock = item as ToolUseBlockParam
-            
-            toolCalls.push({
-              id: toolUseBlock.id, // 直接使用 Claude ID
-              type: 'function' as const,
-              function: {
-                name: toolUseBlock.name,
-                arguments: JSON.stringify(toolUseBlock.input || {})
+              type: 'image_url',
+              image_url: {
+                url: `data:${imageBlock.source.media_type};base64,${imageBlock.source.data}`,
+                detail: 'auto' as const
               }
             })
-            break
+          }
+          break
 
-          case 'tool_result':
-            const toolResultBlock = item as ToolResultBlockParam
+        case 'tool_use':
+          const toolUseBlock = item as ToolUseBlockParam
             
-            return {
-              role: 'tool',
-              content: typeof toolResultBlock.content === 'string' 
-                ? toolResultBlock.content 
-                : JSON.stringify(toolResultBlock.content),
-              tool_call_id: toolResultBlock.tool_use_id // 直接使用 Claude ID
+          toolCalls.push({
+            id: toolUseBlock.id, // 直接使用 Claude ID
+            type: 'function' as const,
+            function: {
+              name: toolUseBlock.name,
+              arguments: JSON.stringify(toolUseBlock.input || {})
             }
+          })
+          break
+
+        case 'tool_result':
+          const toolResultBlock = item as ToolResultBlockParam
+            
+          return {
+            role: 'tool',
+            content: typeof toolResultBlock.content === 'string' 
+              ? toolResultBlock.content 
+              : JSON.stringify(toolResultBlock.content),
+            tool_call_id: toolResultBlock.tool_use_id // 直接使用 Claude ID
+          }
         }
       }
 
@@ -337,8 +337,8 @@ export class ClaudeToOpenAITransformer implements Transformer {
     const encoder = new TextEncoder()
     const self = this
     let messageStarted = false
-    let contentIndex = 0
-    let currentToolCalls: Map<number, any> = new Map()
+    const contentIndex = 0
+    const currentToolCalls: Map<number, any> = new Map()
     
     return new ReadableStream({
       async start(controller) {

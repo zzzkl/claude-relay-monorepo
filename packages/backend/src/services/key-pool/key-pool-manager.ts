@@ -45,11 +45,11 @@ export class KeyPoolManager {
    */
   private createPool(providerId: string, providerType: 'openai' | 'gemini'): BaseKeyPool {
     switch (providerType) {
-      case 'gemini':
-        return new GeminiKeyPool(providerId, this.kv)
-      case 'openai':
-      default:
-        return new OpenAIKeyPool(providerId, this.kv)
+    case 'gemini':
+      return new GeminiKeyPool(providerId, this.kv)
+    case 'openai':
+    default:
+      return new OpenAIKeyPool(providerId, this.kv)
     }
   }
 

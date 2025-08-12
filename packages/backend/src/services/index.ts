@@ -12,6 +12,9 @@ export * from './key-pool'
 // 代理服务
 export * from './proxy'
 
+// 认证服务
+export * from './auth'
+
 // 服务分类导出，方便按功能引用
 export { 
   // Admin Services
@@ -34,3 +37,8 @@ export {
   // Proxy Services
   ClaudeProxyService
 } from './proxy'
+
+export {
+  // Auth Services
+  ClientApiKeyAuthService
+} from './auth'

@@ -27,7 +27,7 @@ export const useProviders = () => {
     description?: string
     type: 'danger' | 'warning' | 'info'
     onConfirm: () => void
-  } | null>(null)
+      } | null>(null)
   const confirmLoading = ref(false)
 
   // 通知函数
