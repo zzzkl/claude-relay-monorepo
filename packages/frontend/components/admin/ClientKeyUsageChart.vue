@@ -50,16 +50,16 @@
     </div>
     
     <!-- 图表容器 -->
-    <div v-if="!loading && chartData.length > 0" class="w-full h-96">
+    <div v-if="!loading && chartData.length > 0" class="w-full h-[400px]">
       <ClientOnly>
         <EChartsWrapper 
           :option="chartOption" 
-          height="384px"
+          height="400px"
           :auto-resize="true"
           @click="handleChartClick"
         />
         <template #fallback>
-          <div class="flex justify-center items-center h-96">
+          <div class="flex justify-center items-center h-[400px]">
             <div class="text-center">
               <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
               <p class="mt-2 text-gray-600">加载图表中...</p>
@@ -70,7 +70,7 @@
     </div>
     
     <!-- 加载状态 -->
-    <div v-else-if="loading" class="flex justify-center items-center h-96">
+    <div v-else-if="loading" class="flex justify-center items-center h-[400px]">
       <div class="text-center">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
         <p class="mt-2 text-gray-600">加载中...</p>
@@ -78,7 +78,7 @@
     </div>
     
     <!-- 空状态 -->
-    <div v-else class="flex flex-col items-center justify-center h-96 text-gray-500">
+    <div v-else class="flex flex-col items-center justify-center h-[400px] text-gray-500">
       <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -157,31 +157,28 @@ const chartOption = computed(() => {
     grid: {
       top: 20,
       right: 20,
-      bottom: 20,
-      left: 150,
+      bottom: 80,
+      left: 60,
       containLabel: true
     },
     xAxis: {
-      type: 'value',
-      axisLabel: {
-        formatter: (value: number) => formatNumber(value)
-      }
-    },
-    yAxis: {
       type: 'category',
       data: data.map(item => item.description || item.keyPreview),
-      inverse: true,
       axisLabel: {
-        width: 120,
-        overflow: 'truncate',
         interval: 0,
+        rotate: 45,
         formatter: (value: string) => {
-          // 如果描述太长，截断并添加省略号
-          if (value.length > 15) {
-            return value.substring(0, 15) + '...'
+          if (value.length > 10) {
+            return value.substring(0, 10) + '...'
           }
           return value
         }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: (value: number) => formatNumber(value)
       }
     },
     series: [
@@ -196,9 +193,12 @@ const chartOption = computed(() => {
         })),
         label: {
           show: true,
-          position: 'right',
-          formatter: (params: any) => formatNumber(params.value)
-        }
+          position: 'top',
+          formatter: (params: any) => formatNumber(params.value),
+          fontSize: 10
+        },
+        barWidth: '40%',
+        barMaxWidth: 35
       }
     ]
   }

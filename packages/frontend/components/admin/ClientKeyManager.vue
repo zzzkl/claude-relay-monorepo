@@ -1,14 +1,17 @@
 <template>
   <div class="space-y-8">
-    <!-- 统计卡片 -->
-    <ClientKeyStatsCards :auto-refresh="true" :refresh-interval="60000" />
-    
-    <!-- 用量排行图 -->
-    <ClientKeyUsageChart 
-      :auto-refresh="true" 
-      :refresh-interval="60000"
-      @key-click="viewKeyDetails"
-    />
+    <!-- 统计卡片和用量排行图布局 -->
+    <div class="space-y-6">
+      <!-- 统计卡片 -->
+      <ClientKeyStatsCards :auto-refresh="true" :refresh-interval="60000" />
+      
+      <!-- 用量排行图 -->
+      <ClientKeyUsageChart 
+        :auto-refresh="true" 
+        :refresh-interval="60000"
+        @key-click="viewKeyDetails"
+      />
+    </div>
     
     <!-- 标题和操作区域 -->
     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-orange-100">
