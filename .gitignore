@@ -37,6 +37,9 @@ lerna-debug.log*
 # Claude Code
 .claude/settings.local.json
 
+# Kiro IDE
+.kiro/
+
 # Cloudflare
 .wrangler/
 # Note: wrangler.toml files are kept for development use
